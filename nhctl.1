@@ -1,0 +1,163 @@
+." Created by Ian Burgwin.
+.TH "NHCTL" 1 "2019-03-22" "Nintendo Homebrew"
+.SH NAME
+nhctl \- interface with Nintendo Homebrew services and the nhd daemon
+.
+.SH SYNOPSIS
+.PD 0
+.B nhctl -h
+.PP
+.B nhctl
+[\fB-qv\fP]
+.I subcommand
+[\fIargs\fP]
+.I ...
+.PD
+.
+.SH DESCRIPTION
+.B nhctl
+is used for performing various actions on Nintendo Homebrew services.
+Actions that require elevated permissions are sent to \fBnhd\fP.
+.
+.SH OPTIONS
+.TP
+.B -h, --help
+Print help message and exit.
+.TP
+.B -q, --quiet
+Suppress error messages.
+.TP
+.B -v, --verbose
+Print out more information about internal socket actions.
+.
+.SH GENERAL COMMANDS
+.TP
+.B list-services
+List the available services.
+.TP
+\fBstatus\fP [\fIservice\fP] ...
+Print status of services.
+.SS Status messages
+.TP
+NOT LINKED
+The unit file is not linked for use.
+.TP
+NOT ENABLED
+The unit is linked, but not enabled.
+It will not start on boot automatically.
+.TP
+NOT STARTED
+The unit is enabled, but not currently running.
+.TP
+RUNNING
+The unit is active.
+.
+.SH SUPEROP COMMANDS
+.TP
+\fBrestart\fP [\fB-f\fP] \fIservice\fP ...
+Restart the given services.
+.RS
+.TP
+\fB-f\fP, \fB--force\fP
+Kill the service. Only use if it seems to not respond.
+.RE
+.
+.TP
+\fBupdate\fP \fIservice\fP ...
+Update and restart the given services to the latest commits of their git repositories.
+.
+.SH OWNER COMMANDS
+.SS System management
+.TP
+\fBnotify-reboot\fP \fB-l\fP|\fB-m\fP \fImessage-code\fP
+Send a message to a channel on Nintendo Homebrew, then reboot the system.
+The sender's name is included in the message.
+.RS
+.TP
+\fB-l\fP, \fB--list\fP
+List available message codes.
+.TP
+\fB-m\fP \fImessage-code\fP, \fB--message\fP \fImessage-code\fP
+Send the message attached to the code and reboot.
+.RE
+.SS User management
+These commands should only be used for managing users for Nintendo Homebrew staff.
+Users for other purposes should be managed with standard Linux utilities (e.g.
+.BR useradd (8),
+.BR userdel (8),
+.BR adduser (8),
+.BR deluser (8),
+.BR usermod (8))
+.TP
+\fBadd-user\fP \fB-u\fP \fIusername\fP \fB-k\fP \fIssh-public-key-file\fP \fB-d\fP \fIdiscord-name\fP \fB-i\fP \fIdiscord-id\fP
+Add a user for an NH staff member to the system. Sends a webhook on success.
+." Oh boy, this doesn't seem like the right way to so it.
+." But I couldn't really find a better way.
+.RS
+.TP
+\fB-u\fP \fIusername\fP, \fB--username\fP \fIusername\fP
+Username to use.
+.TP
+\fB-k\fP \fIssh-public-key-file\fP, \fB--ssh-public-key\fP \fIssh-public-key-file\fP
+SSH public key file path. Must be in OpenSSH format.
+.TP
+\fB-d\fP \fIdiscord-name\fP, \fB--discord-name\fP \fIdiscord-name\fP
+Discord username of the user, without discriminator.
+.TP
+\fB-i\fP \fIdiscord-id\fP, \fB--discord-id\fP \fIdiscord-id\fP
+Discord ID of the user.
+.RE
+.TP
+\fBdel-user\fP [\fB--remove-home\fP] \fB-u\fP \fIusrername\fP
+Delete a user from the system. Sends a webhook on success.
+.RS
+.TP
+\fB-u\fP \fIusername\fP, \fB--username\fP \fIusername\fP
+Username to delete.
+.TP
+.B --remove-home
+Delete the home directory of the user.
+.RE
+.TP
+\fBdisable-user\fP \fB-u\fP \fIusrername\fP
+Disable a user, preventing login. Sends a webhook on success.
+.RS
+.TP
+\fB-u\fP \fIusername\fP, \fB--username\fP \fIusername\fP
+Username to disable.
+.RE
+.TP
+\fBenable-user\fP \fB-u\fP \fIusrername\fP
+Enable a user, allowing login. Sends a webhook on success.
+.RS
+.TP
+\fB-u\fP \fIusername\fP, \fB--username\fP \fIusername\fP
+Username to enable.
+.RE
+.SH EXAMPLES
+.TP
+\fBnhctl restart\fP \fIkurisu mod-mail\fP
+Restart the
+.I kurisu
+and
+.I mod-mail
+services.
+.SH FILES
+.TP
+.I /opt/nintendohomebrew/etc/nhd/discord-id
+Discord IDs for each staff user who has an account on the system.
+.TP
+.I /opt/nintendohomebrew/etc/nhd/ssh-key-names
+SHA-256 hashes of public keys used when a user authenticates via SSH.
+.TP
+.I /opt/nintendohomebrew/etc/nhd/units
+systemd units for each NH service, including nhd itself.
+.TP
+.I /opt/nintendohomebrew/etc/notify-reboot
+Filenames containing messages for \fBnotify-reboot\fP.
+.TP
+.I /opt/nintendohomebrew/etc/webhook.conf
+Webhook URLs, must be mode 0600.
+.TP
+.I /opt/nintendohomebrew/lib/nhd
+Original script location for nhd, nhctl, and bash completion.
