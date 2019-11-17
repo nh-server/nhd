@@ -99,6 +99,7 @@ DISABLED = 1
 NOT_RUNNING = 2
 FAILED = 3
 RUNNING = 4
+UNKNOWN = 5
 
 status_messages = {
     UNLINKED: (b.FAIL, 'NOT-LINKED'),
@@ -106,6 +107,7 @@ status_messages = {
     NOT_RUNNING: (b.WARNING, 'NOT-STARTED'),
     FAILED: (b.FAIL, 'FAILED'),
     RUNNING: (b.OKGREEN, 'RUNNING')
+    UNKNOWN: (b.FAIL, 'UNKNOWN')
 }
 
 
@@ -123,8 +125,10 @@ def check_unit(name: str):
         return NOT_RUNNING
     elif is_active.stdout.startswith(b'failed'):
         return FAILED
+    elif is_active.stdout.startswith(b'active'):
+        return RUNNING
 
-    return RUNNING
+    return UNKNOWN
 
 
 def main(argv: 'List[str]' = None):
