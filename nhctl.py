@@ -97,12 +97,14 @@ class b:
 UNLINKED = 0
 DISABLED = 1
 NOT_RUNNING = 2
-RUNNING = 3
+FAILED = 3
+RUNNING = 4
 
 status_messages = {
     UNLINKED: (b.FAIL, 'NOT-LINKED'),
     DISABLED: (b.WARNING, 'NOT-ENABLED'),
     NOT_RUNNING: (b.WARNING, 'NOT-STARTED'),
+    FAILED: (b.FAIL, 'FAILED'),
     RUNNING: (b.OKGREEN, 'RUNNING')
 }
 
@@ -119,6 +121,8 @@ def check_unit(name: str):
     is_active = sprun(['systemctl', 'is-active', name], stdout=PIPE, stderr=PIPE)
     if is_active.stdout.startswith(b'inactive'):
         return NOT_RUNNING
+    elif is_active.stdout.startswith(b'failed'):
+        return FAILED
 
     return RUNNING
 
