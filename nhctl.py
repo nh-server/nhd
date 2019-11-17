@@ -106,7 +106,7 @@ status_messages = {
     DISABLED: (b.WARNING, 'NOT-ENABLED'),
     NOT_RUNNING: (b.WARNING, 'NOT-STARTED'),
     FAILED: (b.FAIL, 'FAILED'),
-    RUNNING: (b.OKGREEN, 'RUNNING')
+    RUNNING: (b.OKGREEN, 'RUNNING'),
     UNKNOWN: (b.FAIL, 'UNKNOWN')
 }
 
